@@ -53,25 +53,22 @@ class Example_Background_Processing {
 			return;
 		}
 
-		$wp_admin_bar->add_menu( array(
-			'id'    => 'example-plugin',
-			'title' => __( 'Process', 'example-plugin' ),
-			'href'  => '#',
-		) );
+		$wp_admin_bar->add_menu(
+			array(
+				'id'    => 'example-plugin',
+				'title' => __( 'Process', 'example-plugin' ),
+				'href'  => '#',
+			)
+		);
 
-		$wp_admin_bar->add_menu( array(
-			'parent' => 'example-plugin',
-			'id'     => 'example-plugin-single',
-			'title'  => __( 'Single User', 'example-plugin' ),
-			'href'   => wp_nonce_url( admin_url( '?process=single'), 'process' ),
-		) );
-
-		$wp_admin_bar->add_menu( array(
-			'parent' => 'example-plugin',
-			'id'     => 'example-plugin-all',
-			'title'  => __( 'All Users', 'example-plugin' ),
-			'href'   => wp_nonce_url( admin_url( '?process=all'), 'process' ),
-		) );
+		$wp_admin_bar->add_menu(
+			array(
+				'parent' => 'example-plugin',
+				'id'     => 'example-plugin-all',
+				'title'  => __( 'All Users', 'example-plugin' ),
+				'href'   => wp_nonce_url( admin_url( '?process=all' ), 'process' ),
+			)
+		);
 	}
 
 	/**
@@ -82,12 +79,8 @@ class Example_Background_Processing {
 			return;
 		}
 
-		if ( ! wp_verify_nonce( $_GET['_wpnonce'], 'process') ) {
+		if ( ! wp_verify_nonce( $_GET['_wpnonce'], 'process' ) ) {
 			return;
-		}
-
-		if ( 'single' === $_GET['process'] ) {
-			$this->handle_single();
 		}
 
 		if ( 'all' === $_GET['process'] ) {
@@ -110,10 +103,10 @@ class Example_Background_Processing {
 	 * Handle all
 	 */
 	protected function handle_all() {
-		$names = $this->get_names();
+		$kits = $this->get_kits();
 
-		foreach ( $names as $name ) {
-			$this->process_all->push_to_queue( $name );
+		foreach ( $kits as $kit ) {
+			$this->process_all->push_to_queue( $kit );
 		}
 
 		$this->process_all->save()->dispatch();
@@ -124,29 +117,20 @@ class Example_Background_Processing {
 	 *
 	 * @return array
 	 */
-	protected function get_names() {
-		return array(
-			'Grant Buel',
-			'Bryon Pennywell',
-			'Jarred Mccuiston',
-			'Reynaldo Azcona',
-			'Jarrett Pelc',
-			'Blake Terrill',
-			'Romeo Tiernan',
-			'Marion Buckle',
-			'Theodore Barley',
-			'Carmine Hopple',
-			'Suzi Rodrique',
-			'Fran Velez',
-			'Sherly Bolten',
-			'Rossana Ohalloran',
-			'Sonya Water',
-			'Marget Bejarano',
-			'Leslee Mans',
-			'Fernanda Eldred',
-			'Terina Calvo',
-			'Dawn Partridge',
+	protected function get_kits() {
+		global $kitbuilder;
+
+		$args = array(
+			'post_type' => 'kit',
+			'posts_per_page' => -1,
+			'fields' => 'ids',
+			'post_status' => 'publish',
 		);
+
+		$kits = get_posts( $args );
+
+		return $kits;
+
 	}
 
 }
